@@ -75,6 +75,16 @@ add *components:
 sync-spec:
     npm run spec:sync
 
+# Re-render design/header.svg → design/header.png at 2x via headless Chrome.
+header:
+    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+        --headless=new --disable-gpu --hide-scrollbars \
+        --window-size=1600,600 --force-device-scale-factor=2 \
+        --virtual-time-budget=5000 \
+        --screenshot=design/header.png \
+        "file://$(pwd)/design/header.html"
+    @echo "✔ Re-rendered design/header.png"
+
 # ── Maintenance ────────────────────────────────────────────────────────────
 
 # Show outdated package versions.

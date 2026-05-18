@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="design/header.png" alt="Atlas Console — Maniple Research shadcn theme + registry" width="100%">
+</p>
+
 # Atlas Console
 
 A shadcn theme + component registry derived from the **Atlas Console** design treatment for Maniple Research. Light + dark tokens, mono-rectangle status language, sanctum-azure accent, plus the bespoke chrome (`AppFrame`, `AppBar`, `TerminalPlate`).
