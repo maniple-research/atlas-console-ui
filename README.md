@@ -26,11 +26,11 @@ In a Tailwind v4 + shadcn project:
 
 ```bash
 # Tokens only
-npx shadcn@latest add https://atlas-console-ui.example/r/atlas-console.json
+npx shadcn@latest add https://raw.githubusercontent.com/maniple-research/atlas-console-ui/main/public/r/atlas-console.json
 
 # Individual components
-npx shadcn@latest add https://atlas-console-ui.example/r/button.json
-npx shadcn@latest add https://atlas-console-ui.example/r/app-frame.json
+npx shadcn@latest add https://raw.githubusercontent.com/maniple-research/atlas-console-ui/main/public/r/button.json
+npx shadcn@latest add https://raw.githubusercontent.com/maniple-research/atlas-console-ui/main/public/r/app-frame.json
 ```
 
 Then add `className="dark"` to `<html>` (or toggle via the included `ThemeToggle` pattern) for dark mode.

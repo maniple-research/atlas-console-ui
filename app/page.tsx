@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { TerminalPlate } from "@/components/atlas/terminal-plate";
 
 const REGISTRY_URL =
-  "https://atlas-console-ui.maniple.research/r/atlas-console.json";
+  "https://raw.githubusercontent.com/maniple-research/atlas-console-ui/main/public/r/atlas-console.json";
 
 export default function Home() {
   return (

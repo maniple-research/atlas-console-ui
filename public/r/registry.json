@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "atlas-console-ui",
-  "homepage": "https://atlas-console-ui.maniple.research",
+  "homepage": "https://github.com/maniple-research/atlas-console-ui",
   "items": [
     {
       "name": "atlas-console",
