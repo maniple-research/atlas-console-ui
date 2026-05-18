@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "description": "Atlas Console Button — adds primary/secondary/ghost/danger variants and sm size on top of shadcn Button.",
+  "dependencies": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/button.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\nimport { Slot } from \"radix-ui\";\n\nimport { cn } from \"@/lib/utils\";\n\nconst buttonVariants = cva(\n  \"inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-mono uppercase transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5\",\n  {\n    variants: {\n      variant: {\n        // Atlas variants\n        primary:\n          \"bg-primary text-primary-foreground border border-primary font-semibold hover:bg-accent-hi hover:border-accent-hi hover:shadow-[0_0_0_3px_var(--accent-glow)]\",\n        secondary:\n          \"bg-transparent text-foreground border border-border-hi hover:border-primary hover:text-primary\",\n        ghost:\n          \"bg-transparent text-muted-foreground border border-transparent hover:text-primary\",\n        danger:\n          \"border text-danger border-[rgba(229,91,113,0.35)] bg-[var(--danger-tint)] hover:border-danger\",\n        // shadcn-compatible aliases (so shadcn primitives that reference variant=\"default\" still work)\n        default:\n          \"bg-primary text-primary-foreground border border-primary font-semibold hover:bg-accent-hi hover:border-accent-hi hover:shadow-[0_0_0_3px_var(--accent-glow)]\",\n        outline:\n          \"bg-transparent text-foreground border border-border-hi hover:border-primary hover:text-primary\",\n        destructive:\n          \"border text-danger border-[rgba(229,91,113,0.35)] bg-[var(--danger-tint)] hover:border-danger\",\n        link: \"text-primary underline-offset-4 hover:underline normal-case tracking-normal\",\n      },\n      size: {\n        default: \"h-9 px-4 py-2 text-[11px] tracking-[0.14em] has-[>svg]:px-3\",\n        xs: \"h-6 px-2 text-[9.5px] tracking-[0.12em] gap-1\",\n        sm: \"h-7 px-[11px] py-[5px] text-[10px] tracking-[0.12em]\",\n        lg: \"h-10 px-5 text-[12px] tracking-[0.14em]\",\n        icon: \"size-9\",\n        \"icon-xs\": \"size-6 [&_svg:not([class*='size-'])]:size-3\",\n        \"icon-sm\": \"size-7\",\n        \"icon-lg\": \"size-10\",\n      },\n    },\n    defaultVariants: {\n      variant: \"primary\",\n      size: \"default\",\n    },\n  },\n);\n\nfunction Button({\n  className,\n  variant,\n  size,\n  asChild = false,\n  ...props\n}: React.ComponentProps<\"button\"> &\n  VariantProps<typeof buttonVariants> & {\n    asChild?: boolean;\n  }) {\n  const Comp = asChild ? Slot.Root : \"button\";\n\n  return (\n    <Comp\n      data-slot=\"button\"\n      data-variant={variant}\n      data-size={size}\n      className={cn(buttonVariants({ variant, size, className }))}\n      {...props}\n    />\n  );\n}\n\nexport { Button, buttonVariants };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

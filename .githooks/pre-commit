@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Atlas Console pre-commit hook.
+#
+# Rebuilds the shadcn registry JSONs whenever a registry source file is part
+# of the staged changeset, then stages the regenerated artifacts under
+# public/r so the published registry never drifts from the sources.
+#
+# Install once per clone:   just hooks
+# (configures git config core.hooksPath .githooks)
+
+set -euo pipefail
+
+# Files that, when staged, require rebuilding the registry.
+registry_sources_pattern='^(registry\.json|registry/|app/globals\.css|components/(ui|atlas)/)'
+
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if echo "$staged" | grep -Eq "$registry_sources_pattern"; then
+  echo "→ Registry sources changed — rebuilding public/r/*.json"
+  npm run --silent registry:build
+  git add public/r
+fi

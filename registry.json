@@ -1,0 +1,93 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "atlas-console-ui",
+  "homepage": "https://atlas-console-ui.maniple.research",
+  "items": [
+    {
+      "name": "atlas-console",
+      "type": "registry:style",
+      "description": "Atlas Console theme tokens — light + dark, shadcn-compatible plus atlas extensions.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "cssVars": {},
+      "css": {
+        "@import \"tailwindcss\"": ""
+      },
+      "files": [
+        {
+          "path": "registry/atlas-console/styles/atlas-console.css",
+          "type": "registry:style",
+          "target": "app/globals.css"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "description": "Atlas Console Button — adds primary/secondary/ghost/danger variants and sm size on top of shadcn Button.",
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/ui/button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "description": "Atlas Console Badge — status dots (ok/warn/error/neutral/active) plus a sans-dot Flat variant.",
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "app-frame",
+      "type": "registry:component",
+      "description": "Atlas Console AppFrame — bordered chrome shell with lift-shadow and body grid overlay.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/atlas/app-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "app-bar",
+      "type": "registry:component",
+      "description": "Atlas Console AppBar — top nav with brand, links, and meta slot.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/atlas/app-bar.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "terminal-plate",
+      "type": "registry:component",
+      "description": "Atlas Console TerminalPlate — recessed mono code/terminal block with optional label strip.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/atlas/terminal-plate.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

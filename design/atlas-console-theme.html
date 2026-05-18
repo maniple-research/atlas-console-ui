@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas Console — Maniple Research Design Treatment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  /* ─── BACKGROUNDS — near-white greys, light variant ─── */
+  --bg:           #F4F5F7;
+  --surface:      #FFFFFF;
+  --surface-2:    #FAFBFD;
+  --surface-3:    #EAEDF2;
+  /* ─── BORDERS ─── */
+  --border:       #D4D8E0;
+  --border-soft:  #E8EAEF;
+  --border-hi:    #B8C0CF;        /* hover / focus ring */
+
+  /* ─── TEXT ─── */
+  --text:         #0F1119;
+  --text-muted:   #5A6178;
+  --text-dim:     #8C95AB;
+
+  /* ─── ACCENT — sanctum azure, dropped for light mode contrast ─── */
+  --accent:       #2C5BA0;
+  --accent-hi:    #4A7FCF;
+  --accent-lo:    #6FA5F0;
+  --accent-deep:  #1F4477;
+  --accent-glow:  rgba(44, 91, 160, 0.12);
+  --accent-tint:  rgba(44, 91, 160, 0.05);
+  --accent-ink:   #FFFFFF;        /* text on accent fills */
+
+  /* ─── STATUS — darkened a touch for light-bg contrast ─── */
+  --success:      #2E8B5D;
+  --success-tint: rgba(46, 139, 93, 0.10);
+  --warning:      #B8830A;
+  --warning-tint: rgba(184, 131, 10, 0.12);
+  --danger:       #B8423D;
+  --danger-tint:  rgba(184, 66, 61, 0.10);
+
+  /* ─── PLATES — terminal/code plates and form-input fields ────
+     --surface-code is the recessed plate for terminal/JSON blocks
+     and structural header strips (wordmark, app-bar, data-table
+     thead). --surface-input is the form-field background. */
+  --surface-code:  #CCD3E0;
+  --surface-input: #FFFFFF;
+
+  /* ─── GRID overlays (auto-flip per theme) ─── */
+  --grid-major:    rgba(15, 17, 25, 0.04);
+  --grid-minor:    rgba(15, 17, 25, 0.03);
+
+  /* ─── Popover surface (used by menus, attach, kebab) ─── */
+  --popover-bg:     var(--surface);
+  --popover-border: var(--border);
+  --popover-shadow: 0 14px 32px rgba(15, 17, 25, 0.12), 0 1px 0 rgba(15, 17, 25, 0.04);
+
+  /* ─── FONTS ─── */
+  --font-sans:    "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif:   "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --maxw: 1240px;
+  --gutter: clamp(20px, 4vw, 56px);
+}
+
+:root[data-theme="dark"] {
+  /* ─── BACKGROUNDS — navy-tinted darks, sanctum lineage ─── */
+  --bg:           #0B0E15;
+  --surface:      #141826;
+  --surface-2:    #1C2231;
+  --surface-3:    #242B3D;
+  --surface-code: #07090E;
+  --surface-input:#141826;
+
+  /* ─── BORDERS ─── */
+  --border:       #2A3247;
+  --border-soft:  #1E2535;
+  --border-hi:    #3A445F;
+
+  /* ─── TEXT ─── */
+  --text:         #E8EAF0;
+  --text-muted:   #8C95AB;
+  --text-dim:     #5A6178;
+
+  /* ─── ACCENT — sanctum azure, lifted for dark contrast ─── */
+  --accent:       #6FA5F0;
+  --accent-hi:    #92BEFF;
+  --accent-lo:    #4A7FCF;
+  --accent-deep:  #2C5BA0;
+  --accent-glow:  rgba(111, 165, 240, 0.18);
+  --accent-tint:  rgba(111, 165, 240, 0.08);
+  --accent-ink:   #050A14;
+
+  /* ─── STATUS — saturated for dark legibility ─── */
+  --success:      #5BC68A;
+  --success-tint: rgba(91, 198, 138, 0.12);
+  --warning:      #E8B547;
+  --warning-tint: rgba(232, 181, 71, 0.12);
+  --danger:       #E55B71;
+  --danger-tint:  rgba(229, 91, 113, 0.12);
+
+  /* ─── GRID overlays ─── */
+  --grid-major:   rgba(255, 255, 255, 0.018);
+  --grid-minor:   rgba(255, 255, 255, 0.012);
+
+  /* Popover lifts via --surface-2 (brighter than --surface) plus
+     a light-edge inset shadow so the menu reads as elevated. */
+  --popover-bg:     var(--surface-2);
+  --popover-border: var(--border-hi);
+  --popover-shadow: 0 18px 48px rgba(0, 0, 0, 0.45),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  font-size: 14.5px;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+/* faint global grid (pulled from haraldr) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 31px, var(--grid-major) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--grid-minor) 31px 32px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+main, header, .doc-section { position: relative; z-index: 1; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hi); }
+
+::selection { background: var(--accent-glow); color: var(--text); }
+
+/* ============== DOC HEADER ============== */
+.doc-header {
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.doc-header::before {
+  content: "";
+  position: absolute;
+  top: -240px; right: -240px;
+  width: 760px; height: 760px;
+  background: radial-gradient(circle, var(--accent-glow), transparent 65%);
+  pointer-events: none;
+}
+.doc-header-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 64px var(--gutter) 56px;
+  position: relative;
+}
+.doc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.doc-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 12px; height: 12px;
+  background: var(--accent);
+}
+.doc-eyebrow::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--border-hi);
+  max-width: 320px;
+}
+
+.doc-title {
+  font-family: var(--font-serif);
+  font-size: clamp(38px, 5.5vw, 64px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 18px;
+}
+.doc-title .accent { color: var(--accent); font-style: italic; }
+.doc-variant-tag {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+.doc-variant-tag .sep { color: var(--accent); margin: 0 8px; opacity: 0.7; }
+.doc-lede {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 64ch;
+  line-height: 1.65;
+}
+.doc-lede strong { color: var(--text); font-weight: 600; }
+
+.doc-meta {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.doc-meta span strong { color: var(--text-muted); font-weight: 500; }
+
+/* ============== SECTION FRAMING ============== */
+.doc-section {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 64px var(--gutter);
+  border-top: 1px dashed var(--border);
+}
+.doc-section:first-of-type { border-top: 0; }
+
+.fig-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fig-label .num { color: var(--accent); font-weight: 600; }
+.fig-label::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--border);
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.section-blurb {
+  color: var(--text-muted);
+  font-size: 15px;
+  max-width: 68ch;
+  margin-bottom: 32px;
+  line-height: 1.65;
+}
+.section-blurb strong { color: var(--text); font-weight: 600; }
+.section-blurb code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent);
+  background: var(--accent-tint);
+  padding: 1px 6px;
+}
+
+/* ============== TOKEN PANELS ============== */
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+@media (max-width: 820px) { .token-grid { grid-template-columns: 1fr; } }
+
+.token-panel {
+  background: var(--surface);
+  padding: 22px 24px 24px;
+}
+.token-panel-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.token-panel-title .pnum { color: var(--accent); font-weight: 600; }
+
+.swatch-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 14px;
+  padding: 8px 0;
+  border-top: 1px dashed var(--border);
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.swatch-row:first-of-type { border-top: 0; padding-top: 4px; }
+.swatch {
+  width: 36px;
+  height: 22px;
+  border: 1px solid var(--border-hi);
+}
+.swatch-name { color: var(--text); }
+.swatch-hex { color: var(--text-dim); font-size: 11px; letter-spacing: 0.04em; }
+
+.type-row {
+  padding: 10px 0;
+  border-top: 1px dashed var(--border);
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 18px;
+  align-items: baseline;
+}
+.type-row:first-of-type { border-top: 0; padding-top: 4px; }
+.type-row .type-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding-top: 6px;
+}
+.type-sample-serif  { font-family: var(--font-serif); font-size: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+.type-sample-sans   { font-family: var(--font-sans);  font-size: 15px; font-weight: 500; color: var(--text); }
+.type-sample-mono   { font-family: var(--font-mono);  font-size: 12px; color: var(--accent); letter-spacing: 0.04em; }
+
+/* ============== GLYPH SHOWCASE ============== */
+.glyph-showcase {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+@media (max-width: 700px) { .glyph-showcase { grid-template-columns: 1fr; } }
+.glyph-cell {
+  background: var(--surface);
+  padding: 40px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 200px;
+  position: relative;
+}
+.glyph-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 23px, var(--grid-major) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, var(--grid-minor) 23px 24px);
+  pointer-events: none;
+}
+.glyph-cell > * { position: relative; }
+.glyph-cell svg { color: var(--accent); display: block; }
+.glyph-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+.glyph-label .dim { color: var(--text-dim); font-weight: 400; }
+
+.wordmark-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.wordmark-cell {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 32px;
+  background: var(--surface-code);
+  border: 1px solid var(--border);
+}
+/* In dark, --surface-code is so close to --bg that the wordmark plate
+   disappears. Lift to --surface-3 so the wordmark reads as a framed
+   brand-display plate. */
+:root[data-theme="dark"] .wordmark-cell {
+  background: var(--surface-3);
+  border-color: var(--border-hi);
+}
+.wordmark-cell svg { color: var(--accent); flex-shrink: 0; }
+.wordmark-name {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  line-height: 1;
+}
+.wordmark-cell .wordmark-dot { color: var(--accent); }
+.wordmark-cell.sm .wordmark-name { font-size: 16px; }
+.wordmark-cell.md .wordmark-name { font-size: 22px; }
+.wordmark-cell.lg .wordmark-name { font-size: 32px; letter-spacing: -0.02em; }
+
+/* ============== BUTTONS ============== */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--text);
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background: var(--accent-hi);
+  border-color: var(--accent-hi);
+  color: var(--accent-ink);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.btn-secondary {
+  border-color: var(--border-hi);
+  color: var(--text);
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn-ghost {
+  color: var(--text-muted);
+  padding: 9px 10px;
+}
+.btn-ghost:hover { color: var(--accent); }
+
+.btn-danger {
+  border-color: rgba(229, 91, 113, 0.35);
+  color: var(--danger);
+  background: var(--danger-tint);
+}
+.btn-danger:hover { border-color: var(--danger); }
+
+.btn-sm {
+  padding: 5px 11px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+/* ============== STATUS BADGES (mono, rectangular) ============== */
+.badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.badge-ok {
+  color: var(--success);
+  background: var(--success-tint);
+  border-color: rgba(91, 198, 138, 0.28);
+}
+.badge-ok::before {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(91, 198, 138, 0.18);
+}
+.badge-warn {
+  color: var(--warning);
+  background: var(--warning-tint);
+  border-color: rgba(232, 181, 71, 0.32);
+}
+.badge-warn::before { background: var(--warning); }
+.badge-error {
+  color: var(--danger);
+  background: var(--danger-tint);
+  border-color: rgba(229, 91, 113, 0.32);
+}
+.badge-error::before { background: var(--danger); }
+.badge-neutral {
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.badge-neutral::before { background: var(--text-dim); }
+.badge-active {
+  color: var(--accent);
+  background: var(--accent-tint);
+  border-color: rgba(111, 165, 240, 0.32);
+}
+.badge-active::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* badge sans-dot variant for simple flags */
+.badge-flat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  display: inline-block;
+  border: 1px solid var(--border);
+}
+.badge-flat.true  { color: var(--success); border-color: rgba(91, 198, 138, 0.32); background: var(--success-tint); }
+.badge-flat.false { color: var(--text-dim); border-color: var(--border); background: var(--surface-2); }
+
+/* ============== ADMIN MOCK FRAME ============== */
+.app-frame {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 var(--border-soft),
+    0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+/* top app-bar */
+.app-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface-code);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+}
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 22px;
+  border-right: 1px solid var(--border);
+  height: 100%;
+}
+.app-brand .brand-glyph {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  flex-shrink: 0;
+  display: block;
+}
+.app-brand .dot { color: var(--accent); }
+.app-brand .name {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.app-brand .dot { color: var(--accent); }
+
+.app-nav {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+}
+.app-nav a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-right: 1px solid var(--border-soft);
+  position: relative;
+  transition: color 0.12s, background 0.12s;
+}
+.app-nav a:hover { color: var(--text); background: var(--surface-2); }
+.app-nav a.active {
+  color: var(--accent);
+  background: var(--surface);
+}
+.app-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 2px;
+  background: var(--accent);
+}
+.app-meta {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-right: 22px;
+  gap: 14px;
+}
+.app-meta .who {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+.app-meta .who strong { color: var(--text-muted); font-weight: 500; }
+
+/* page body */
+.app-body {
+  padding: 36px 36px 44px;
+  background: var(--surface);
+  position: relative;
+}
+.app-body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 31px, var(--grid-minor) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--grid-major) 31px 32px);
+  pointer-events: none;
+}
+.app-body > * { position: relative; }
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--border);
+}
+.page-head .crumb {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.page-head .crumb .accent { color: var(--accent); }
+.page-head h1 {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+.page-head .head-actions { display: flex; gap: 8px; }
+
+.subhead {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 28px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.subhead .num { color: var(--accent); font-weight: 600; }
+.subhead::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--border);
+}
+/* v2: when the subhead has trailing meta, drop the dashed rule
+   so right-aligned counts/timestamps don't fight a horizontal line. */
+.subhead:has(.subhead-meta)::after { display: none; }
+.subhead-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.subhead-meta .sep { color: var(--accent); margin: 0 6px; opacity: 0.7; }
+
+/* ── Identity strip ── */
+.identity-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.identity-cell {
+  background: var(--surface-2);
+  padding: 12px 18px;
+  flex: 1;
+  min-width: 200px;
+  border-right: 1px solid var(--border);
+}
+.identity-cell:last-child { border-right: 0; }
+.identity-cell .label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.identity-cell .value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+.identity-cell .value.muted { color: var(--text-muted); }
+
+/* ── Status grid (system status block) ── */
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.status-row {
+  display: grid;
+  grid-template-columns: 220px 100px 1fr;
+  gap: 16px;
+  align-items: center;
+  background: var(--surface-2);
+  padding: 13px 18px;
+}
+.status-row .label {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+.status-row.overall .label {
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.status-row .json {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow-x: auto;
+}
+.status-row .json .k { color: var(--accent-hi); }
+.status-row .json .b { color: var(--success); }
+.status-row .json .n { color: var(--text); }
+.status-row .json .s { color: var(--warning); }
+
+/* ── Data table (Customers / Toggles / Flags / Invitations) ── */
+.data-table {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13.5px;
+}
+.data-table thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 11px 16px;
+  background: var(--surface-code);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.data-table thead th:not(:last-child) { border-right: 1px solid var(--border-soft); }
+.data-table tbody td {
+  padding: 11px 16px;
+  border-bottom: 1px dashed var(--border);
+  vertical-align: middle;
+  color: var(--text);
+}
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table tbody tr:hover td { background: var(--surface-3); }
+.data-table td.mono { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); }
+.data-table td.email { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.data-table td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 12.5px; }
+.data-table td.actions { text-align: right; white-space: nowrap; }
+.data-table td.actions a { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.t-link {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.12s;
+}
+.t-link:hover { border-color: var(--accent); }
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.filter-group { display: flex; align-items: center; gap: 10px; }
+.filter-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.filter-meta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.filter-meta strong { color: var(--text); font-weight: 600; }
+
+/* form controls */
+.input, .select, .textarea {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-hi);
+  color: var(--text);
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.input::placeholder, .textarea::placeholder { color: var(--text-dim); }
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 28px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+                    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.input.w-md { width: 320px; max-width: 100%; }
+.input.w-lg { width: 460px; max-width: 100%; }
+.textarea { display: block; width: 100%; min-height: 110px; resize: vertical; line-height: 1.6; }
+
+/* ── Diagnostic action list ── */
+.action-list {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.action-row {
+  display: grid;
+  grid-template-columns: 220px auto 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px dashed var(--border);
+  transition: background 0.12s;
+}
+.action-row:last-child { border-bottom: 0; }
+.action-row:hover { background: var(--surface-3); }
+.action-row .a-name {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.action-row .a-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.action-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  margin-bottom: 18px;
+  line-height: 1.7;
+}
+.action-note code {
+  color: var(--accent);
+  background: var(--accent-tint);
+  padding: 1px 6px;
+}
+
+/* ── Terminal/JSON readout ── */
+.term {
+  background: var(--surface-code);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+.term-head {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  padding: 9px 14px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.term-head .dots { display: flex; gap: 5px; }
+.term-head .dots span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text-dim);
+}
+.term-head .dots span:nth-child(1) { background: var(--danger); }
+.term-head .dots span:nth-child(2) { background: var(--warning); }
+.term-head .dots span:nth-child(3) { background: var(--success); }
+.term-head .meta {
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+.term-head .meta .accent { color: var(--accent); }
+.term-body {
+  padding: 18px 22px 22px;
+  font-size: 12.5px;
+  line-height: 1.85;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+}
+.term-body .k  { color: var(--accent-hi); }     /* json keys */
+.term-body .b  { color: var(--success); }       /* booleans */
+.term-body .n  { color: var(--text); }          /* numbers */
+.term-body .s  { color: var(--warning); }       /* strings */
+.term-body .nl { color: var(--text-dim); }      /* null */
+.term-body .p  { color: var(--text-muted); }    /* punctuation */
+.term-body .cmt{ color: var(--text-dim); font-style: italic; }
+
+/* ── Banner editor / form layout ── */
+.form-stack { display: flex; flex-direction: column; gap: 16px; max-width: 720px; }
+.field-row { display: flex; flex-direction: column; gap: 6px; }
+.field-row label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.field-help {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+/* preview pane (banner preview) */
+.preview-pane {
+  margin-top: 10px;
+  border: 1px dashed var(--border-hi);
+  padding: 14px 16px;
+  background: var(--surface-code);
+}
+.preview-pane .ptag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.preview-pane .ptag::after { content: ""; flex: 1; border-top: 1px dashed var(--border); }
+
+.banner-mock {
+  padding: 12px 16px;
+  border-left: 3px solid var(--warning);
+  background: var(--warning-tint);
+  color: var(--text);
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.banner-mock .b-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--warning);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── Empty-state row ── */
+.empty {
+  padding: 28px 18px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border: 1px dashed var(--border);
+  background: var(--surface-2);
+}
+
+/* ── Tailwind config block ── */
+.config-block {
+  background: var(--surface-code);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--text);
+}
+.config-head {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.config-head .lang { color: var(--accent); font-weight: 600; }
+.config-body {
+  padding: 18px 22px 22px;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}
+.config-body .kw { color: var(--accent-hi); }
+.config-body .pr { color: var(--success); }
+.config-body .v  { color: var(--warning); }
+.config-body .cm { color: var(--text-dim); font-style: italic; }
+.config-body .pn { color: var(--text-muted); }
+
+/* footer */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+  padding: 32px var(--gutter);
+  max-width: var(--maxw);
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.doc-footer strong { color: var(--text-muted); font-weight: 500; }
+
+/* responsive trims */
+@media (max-width: 760px) {
+  .app-nav a { padding: 0 12px; font-size: 10px; letter-spacing: 0.12em; }
+  .app-meta { display: none; }
+  .app-body { padding: 22px 18px 28px; }
+  .data-table { font-size: 12.5px; }
+  .data-table thead th, .data-table tbody td { padding: 9px 10px; }
+  .status-row { grid-template-columns: 130px 80px 1fr; }
+  .action-row { grid-template-columns: 1fr; gap: 10px; padding: 14px; }
+  .action-row .a-desc { order: 3; }
+  .identity-cell { min-width: 50%; }
+  .page-head h1 { font-size: 26px; }
+}
+
+
+/* ============================================================
+ * v2 ADDITIONS — patterns discovered while applying atlas to a
+ * real product surface (see design/mocks/). Each block here
+ * is a canonical component that v1 left to the consumer.
+ * ============================================================ */
+
+/* ────────────────────────────────────────────────────────────
+   APP-SHELL — side-nav variant of the admin frame.
+   v1 only specified .app-bar / .app-nav (top-nav). Real apps
+   often want sidebar nav with profile trigger + recents + nav
+   sections. The shell coexists with .app-frame; .shell-main
+   takes the same body grid treatment as .app-body.
+   ──────────────────────────────────────────────────────────── */
+:root { --sidebar-width: 260px; }
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.shell-sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--surface-3);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 20;
+  overflow-y: auto;
+}
+.shell-main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-width: 0;
+  padding: 36px 48px 64px;
+  max-width: 1240px;
+  position: relative;
+}
+.shell-main::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 31px, var(--grid-major) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--grid-minor) 31px 32px);
+  pointer-events: none;
+}
+.shell-main > * { position: relative; z-index: 1; }
+
+/* Sidebar nav atoms — side-nav active state.
+   v1 nav uses a 2px top stripe (correct for top-nav).
+   For side-nav, the analogue is a heavier left bar PLUS an
+   accent-tint bg, so the active row reads from across the page. */
+.sidebar-section-label {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-dim); padding: 14px 22px 6px;
+}
+.sidebar-link {
+  display: block; padding: 7px 22px;
+  color: var(--text-muted); font-size: 13px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: color 0.12s, background 0.12s;
+}
+.sidebar-link:hover { color: var(--text); background: var(--surface-2); }
+.sidebar-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-tint);
+  font-weight: 500;
+}
+
+/* ────────────────────────────────────────────────────────────
+   POPOVER SURFACE — used by the profile menu, attach menu,
+   row-action kebab menu. Lifts above the parent with a soft
+   shadow so it reads as a menu, not a nested panel.
+   ──────────────────────────────────────────────────────────── */
+.popover-surface {
+  background: var(--popover-bg);
+  border: 1px solid var(--popover-border);
+  box-shadow: var(--popover-shadow);
+  padding: 6px;
+  z-index: 30;
+}
+.popover-header {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-dim); padding: 8px 10px 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.popover-item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 9px 12px;
+  background: transparent; border: 0;
+  color: var(--text); font-size: 13px; font-family: var(--font-sans);
+  text-align: left; cursor: pointer; text-decoration: none;
+}
+.popover-item:hover,
+.popover-item.is-focus { background: var(--surface-2); }
+.popover-item svg { color: var(--text-muted); flex-shrink: 0; }
+.popover-item .label { flex: 1; }
+.popover-item .shortcut {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.1em; color: var(--text-dim);
+}
+.popover-divider { height: 1px; background: var(--border); margin: 5px 8px; }
+
+/* ────────────────────────────────────────────────────────────
+   ROW-LIST — rich list rows, distinct from .data-table.
+   Use when each row has its own visual hierarchy (title +
+   chips + multi-line meta on the left, value + actions on
+   the right). Data-table is for grid-aligned tabular data.
+   ──────────────────────────────────────────────────────────── */
+.row-list {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.row-list > .row {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px dashed var(--border);
+}
+.row-list > .row:last-child { border-bottom: 0; }
+.row .main { flex: 1; min-width: 0; }
+.row .title {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+}
+.row .title a { color: var(--accent); text-decoration: none; }
+.row .meta {
+  font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--text-muted); margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+.row .balance {
+  text-align: right; display: flex;
+  flex-direction: column; align-items: flex-end;
+}
+.row .balance-value {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+.row .balance-as-of {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 2px;
+}
+
+/* Kebab / row-menu trigger lives at the end of each row. */
+.row-menu { position: relative; display: inline-block; }
+.row-menu-trigger {
+  width: 26px; height: 26px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-muted); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.row-menu-trigger:hover,
+.row-menu.is-open .row-menu-trigger {
+  color: var(--text); border-color: var(--border);
+}
+.row-menu-popover {
+  display: none;
+  position: absolute; top: calc(100% + 4px); right: 0;
+  min-width: 180px;
+}
+.row-menu.is-open .row-menu-popover { display: block; }
+
+/* ────────────────────────────────────────────────────────────
+   CARD WITH HEAD + FOOT — codifies .app-frame as a three-slot
+   container (head strip, body, foot action bar).
+   ──────────────────────────────────────────────────────────── */
+.frame-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 22px;
+  background: var(--surface-code);
+  border-bottom: 1px solid var(--border);
+}
+.frame-head-title {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text); font-weight: 600;
+}
+.frame-head-meta {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.frame-head-meta .accent { color: var(--accent); }
+.frame-foot {
+  display: flex; gap: 8px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+/* ────────────────────────────────────────────────────────────
+   SEGMENTED CONTROL — binary/ternary state selector.
+   Radio-backed for accessibility; mono-caps labels; accent
+   fill on the checked option.
+   ──────────────────────────────────────────────────────────── */
+.seg-control {
+  display: inline-flex; width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px;
+}
+.seg-option { flex: 1; position: relative; display: flex; }
+.seg-option input[type="radio"] {
+  position: absolute; inset: 0; opacity: 0;
+  margin: 0; cursor: pointer;
+}
+.seg-option > span {
+  flex: 1; text-align: center;
+  padding: 6px 10px;
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+}
+.seg-option input:checked + span {
+  background: var(--accent); color: var(--accent-ink);
+}
+.seg-option input:focus-visible + span {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   BOOLEAN ATTRIBUTE INDICATORS — ✓ when set, — when not.
+   Used for per-row flag displays (Redacted / Tokenized /
+   Archived on doc rows; can be reused anywhere a row has
+   a small set of booleans to surface).
+   ──────────────────────────────────────────────────────────── */
+.attr-list {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  margin: 6px 0 2px;
+}
+.attr {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.attr.is-on { color: var(--success); }
+.attr.is-on svg { color: var(--success); }
+.attr-dash {
+  display: inline-flex; width: 14px; height: 14px;
+  align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 12px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   GHOST-STATUS BUTTONS — quieter destructive / affirmative
+   variants for inline use (e.g. Confirm/Reject inside a
+   table row, Revoke inside a list row). Tinted bg + colored
+   text + matching border; hover fills the color.
+   ──────────────────────────────────────────────────────────── */
+.btn-danger {
+  background: var(--danger-tint); color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger); color: #ffffff; text-decoration: none;
+}
+.btn-success {
+  background: var(--success-tint); color: var(--success);
+  border-color: var(--success);
+}
+.btn-success:hover:not(:disabled) {
+  background: var(--success); color: #ffffff; text-decoration: none;
+}
+
+/* ────────────────────────────────────────────────────────────
+   CENTERED-PANE — sign-in, error, invite-confirm.
+   No doc-section, no admin frame. Single card centered in
+   the viewport, narrow column, optional crumb above.
+   ──────────────────────────────────────────────────────────── */
+.centered-pane {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.centered-card {
+  width: 100%; max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 44px 40px;
+  text-align: center;
+}
+.centered-card .crumb {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 22px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.centered-card .crumb::before,
+.centered-card .crumb::after {
+  content: ""; flex: 1; max-width: 60px;
+  border-top: 1px dashed var(--border);
+}
+.centered-card h1 {
+  font-family: var(--font-serif); font-size: 30px; font-weight: 600;
+  letter-spacing: -0.02em; color: var(--text); margin-bottom: 10px;
+}
+.centered-card .tagline {
+  font-family: var(--font-serif); font-style: italic;
+  color: var(--text-muted); margin-bottom: 28px; font-size: 15px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   PAGE-TAB ACTIVE — add an accent-tint bg behind the bottom
+   border so the active tab reads from peripheral vision.
+   The 2px bottom border alone underreads on light bg.
+   ──────────────────────────────────────────────────────────── */
+.page-tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+.page-tab {
+  display: inline-flex; align-items: center;
+  padding: 11px 18px;
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-muted); text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.page-tab:hover { color: var(--text); }
+.page-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+/* ────────────────────────────────────────────────────────────
+   PAGE NOTE — mono-muted footnote line below a card. Used
+   for non-editable ids, member-since dates, timestamps.
+   ──────────────────────────────────────────────────────────── */
+.page-note {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin: 14px 4px 28px; line-height: 1.5;
+}
+.page-note .sep  { color: var(--accent); margin: 0 6px; }
+.page-note .mono { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+
+
+/* ============== MANIPLE LOGO VARIANTS (Fig 02) ============== */
+.lm-variants {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+@media (max-width: 820px) { .lm-variants { grid-template-columns: repeat(2, 1fr); } }
+.lm-variant {
+  background: var(--surface);
+  padding: 28px 22px 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lm-variant .specimen {
+  height: 88px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.lm-variant .specimen svg { display: block; }
+.lm-variant .name {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text); font-weight: 600;
+  margin-bottom: 6px;
+}
+.lm-variant .range {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.lm-variant .blurb {
+  font-size: 12.5px; color: var(--text-muted);
+  line-height: 1.5; max-width: 22ch;
+}
+
+/* ============== SPINNER VARIANTS (Fig 17) ============== */
+.spinner-row {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 28px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 28px 30px;
+  margin-bottom: 1px;
+}
+.spinner-row + .spinner-row { margin-top: -1px; }
+.spinner-row .meta h3 {
+  font-family: var(--font-serif);
+  font-size: 22px; font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.spinner-row .meta p {
+  color: var(--text-muted); font-size: 13.5px;
+  line-height: 1.55; margin-bottom: 10px;
+}
+.spinner-row .meta .range {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.spinner-row .meta .range strong { color: var(--accent); font-weight: 600; }
+.spinner-sizes {
+  display: flex; align-items: center; justify-content: space-around;
+  gap: 18px; padding: 8px 0;
+  color: var(--text);
+}
+.spinner-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.spinner-cell .specimen { height: 56px; display: flex; align-items: center; justify-content: center; }
+.spinner-cell .label {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+
+
+
+/* ============== THEME TOGGLE & data-theme-only ============== */
+.theme-toggle {
+  position: absolute;
+  top: 32px;
+  right: var(--gutter);
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px;
+  z-index: 5;
+}
+.theme-toggle-btn {
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+.theme-toggle-btn:hover { color: var(--text); }
+.theme-toggle-btn.is-active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Reveal the active variant's prose; hide the other.
+   Default (no [data-theme] yet) shows light; data-theme="dark" inverts. */
+[data-theme-only="dark"] { display: none; }
+:root[data-theme="dark"] [data-theme-only="light"] { display: none; }
+:root[data-theme="dark"] [data-theme-only="dark"]  { display: revert; }
+
+/* Swatch hex labels swap content per theme via data attributes. */
+.swatch-hex { display: inline-block; }
+.swatch-hex::after { content: attr(data-light); }
+:root[data-theme="dark"] .swatch-hex::after { content: attr(data-dark); }
+
+</style>
+</head>
+<body>
+<!-- Maniple SVG sprite — spinner symbols reused at multiple sizes via <use>. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="mn-spinner-orbit" viewBox="0 0 100 100">
+    <g transform="translate(50 50)">
+      <g>
+        <rect x="-32" y="-32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" calcMode="linear" repeatCount="indefinite"/>
+      </g>
+      <g>
+        <rect x="-26" y="-26" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <animateTransform attributeName="transform" type="rotate" from="22.5" to="-337.5" dur="4s" calcMode="linear" repeatCount="indefinite"/>
+      </g>
+      <g>
+        <rect x="-15" y="-15" width="30" height="30" fill="var(--accent)"/>
+        <animateTransform attributeName="transform" type="rotate" from="45" to="405" dur="2.5s" calcMode="linear" repeatCount="indefinite"/>
+      </g>
+    </g>
+  </symbol>
+  <symbol id="mn-spinner-pulse" viewBox="0 0 100 100">
+    <g transform="translate(50 50)">
+      <g>
+        <rect x="-30" y="-30" width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <animateTransform attributeName="transform" type="rotate" from="45" to="405" dur="3s" calcMode="linear" repeatCount="indefinite"/>
+      </g>
+      <g transform="rotate(45)">
+        <rect x="-15" y="-15" width="30" height="30" fill="var(--accent)">
+          <animateTransform attributeName="transform" type="scale"
+            values="1;1.15;1;0.85;1" keyTimes="0;0.25;0.5;0.75;1"
+            dur="2s" calcMode="spline"
+            keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
+            repeatCount="indefinite"/>
+        </rect>
+      </g>
+    </g>
+  </symbol>
+  <symbol id="mn-spinner-dwell" viewBox="0 0 100 100">
+    <g transform="translate(50 50)">
+      <g>
+        <rect x="-30" y="-30" width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <animateTransform attributeName="transform" type="rotate"
+          values="45;135;135;225;225;315;315;405;405"
+          keyTimes="0;0.15;0.25;0.4;0.5;0.65;0.75;0.9;1"
+          keySplines="0.4 0 0.2 1;0 0 1 1;0.4 0 0.2 1;0 0 1 1;0.4 0 0.2 1;0 0 1 1;0.4 0 0.2 1;0 0 1 1"
+          calcMode="spline" dur="4s" repeatCount="indefinite"/>
+      </g>
+      <rect x="-15" y="-15" width="30" height="30" transform="rotate(45)" fill="var(--accent)"/>
+    </g>
+  </symbol>
+</svg>
+
+
+<!-- ============== DOC HEADER ============== -->
+<header class="doc-header">
+  <div class="doc-header-inner">
+    <div class="doc-eyebrow"><span>Maniple Research</span><span>·</span><span>Design Treatment</span></div>
+    <div class="theme-toggle" role="group" aria-label="Theme variant">
+      <button type="button" class="theme-toggle-btn" data-set-theme="light">Light</button>
+      <button type="button" class="theme-toggle-btn" data-set-theme="dark">Dark</button>
+    </div>
+    <h1 class="doc-title">Atlas <span class="accent">Console</span></h1>
+    <div class="doc-variant-tag">
+      <span data-theme-only="light">Light variant <span class="sep">·</span> v0.3</span>
+      <span data-theme-only="dark">Dark variant <span class="sep">·</span> v0.3</span>
+    </div>
+    <p class="doc-lede" data-theme-only="light">
+      The light variant of Atlas Console — Maniple Research's design treatment cast
+      for <strong>daylight surfaces</strong>. Same archival, careful tone as the dark register;
+      same Sanctum lineage; same <strong>terminal-grade</strong> information density. The azure
+      accent drops from <code>#6FA5F0</code> to <code>#2C5BA0</code> so it stays legible against a
+      near-white-grey ground. Mono labels, sharp borders, and JSON-as-art borrowed from the
+      registrar-blueprint school — unchanged.
+    </p>
+    <p class="doc-lede" data-theme-only="dark">
+      The dark variant of Atlas Console — Maniple Research's design treatment in its native
+      <strong>terminal register</strong>. Sanctum's archival tone made literal; the operator surface speaks
+      in the technical, <strong>terminal-grade</strong> language ops work actually demands. The azure
+      accent lifts from <code>#2C5BA0</code> to <code>#6FA5F0</code> so it stays legible against a
+      navy-tinted dark canvas. Mono labels, sharp borders, and JSON-as-art borrowed from the
+      registrar-blueprint school — unchanged.
+    </p>
+    <div class="doc-meta">
+      <span><strong>Version</strong> &nbsp;0.3 · May 2026</span>
+      <span><strong>Stack</strong> &nbsp;Tailwind compatible</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============== FIG 01 — DESIGN TOKENS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 01</span><span>Design tokens</span></div>
+  <h2 class="section-title">A small, opinionated palette.</h2>
+  <p class="section-blurb">
+    Every surface, border, and text color resolves to one of these tokens. The accent
+    is Sanctum's <code>#4a6fa5</code> family, <span data-theme-only="light">dropped to <code>#2C5BA0</code> so it
+    stays legible against the near-white-grey ground</span><span data-theme-only="dark">lifted to <code>#6FA5F0</code> so it
+    stays legible against the navy-tinted dark canvas</span>. Everything else is the supporting cast.
+  </p>
+
+  <div class="token-grid">
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">01</span> Surfaces &amp; borders</div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--bg);"></span><span class="swatch-name">--bg</span><span class="swatch-hex" data-light="#F4F5F7" data-dark="#0B0E15"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--surface);"></span><span class="swatch-name">--surface</span><span class="swatch-hex" data-light="#FFFFFF" data-dark="#141826"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--surface-2);"></span><span class="swatch-name">--surface-2</span><span class="swatch-hex" data-light="#FAFBFD" data-dark="#1C2231"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--surface-3);"></span><span class="swatch-name">--surface-3</span><span class="swatch-hex" data-light="#EAEDF2" data-dark="#242B3D"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--surface-code);"></span><span class="swatch-name">--surface-code</span><span class="swatch-hex" data-light="#CCD3E0" data-dark="#07090E"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--border);"></span><span class="swatch-name">--border</span><span class="swatch-hex" data-light="#D4D8E0" data-dark="#2A3247"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--border-soft);"></span><span class="swatch-name">--border-soft</span><span class="swatch-hex" data-light="#E8EAEF" data-dark="#1E2535"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--border-hi);"></span><span class="swatch-name">--border-hi</span><span class="swatch-hex" data-light="#B8C0CF" data-dark="#3A445F"></span></div>
+    </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">02</span> Text</div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--text);"></span><span class="swatch-name">--text</span><span class="swatch-hex" data-light="#0F1119" data-dark="#E8EAF0"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--text-muted);"></span><span class="swatch-name">--text-muted</span><span class="swatch-hex" data-light="#5A6178" data-dark="#8C95AB"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--text-dim);"></span><span class="swatch-name">--text-dim</span><span class="swatch-hex" data-light="#8C95AB" data-dark="#5A6178"></span></div>
+    </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">03</span> Accent — sanctum azure, <span data-theme-only="light">dropped</span><span data-theme-only="dark">lifted</span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent);"></span><span class="swatch-name">--accent</span><span class="swatch-hex" data-light="#2C5BA0" data-dark="#6FA5F0"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent-hi);"></span><span class="swatch-name">--accent-hi</span><span class="swatch-hex" data-light="#4A7FCF" data-dark="#92BEFF"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent-lo);"></span><span class="swatch-name">--accent-lo</span><span class="swatch-hex" data-light="#6FA5F0" data-dark="#4A7FCF"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent-deep);"></span><span class="swatch-name">--accent-deep</span><span class="swatch-hex" data-light="#1F4477" data-dark="#2C5BA0"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent-glow); border-color: var(--border-hi);"></span><span class="swatch-name">--accent-glow</span><span class="swatch-hex" data-light="rgba 12%" data-dark="rgba 18%"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--accent-tint); border-color: var(--border-hi);"></span><span class="swatch-name">--accent-tint</span><span class="swatch-hex" data-light="rgba 5%" data-dark="rgba 8%"></span></div>
+    </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">04</span> Status</div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--success);"></span><span class="swatch-name">--success</span><span class="swatch-hex" data-light="#2E8B5D" data-dark="#5BC68A"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--warning);"></span><span class="swatch-name">--warning</span><span class="swatch-hex" data-light="#B8830A" data-dark="#E8B547"></span></div>
+      <div class="swatch-row"><span class="swatch" style="background: var(--danger);"></span><span class="swatch-name">--danger</span><span class="swatch-hex" data-light="#B8423D" data-dark="#E55B71"></span></div>
+    </div>
+  </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">02</span> Text</div>
+      <div class="swatch-row"><span class="swatch" style="background:#0F1119"></span><span class="swatch-name">--text</span><span class="swatch-hex">#0F1119</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#8C95AB"></span><span class="swatch-name">--text-muted</span><span class="swatch-hex">#8C95AB</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#5A6178"></span><span class="swatch-name">--text-dim</span><span class="swatch-hex">#5A6178</span></div>
+    </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">03</span> Accent — sanctum azure, dropped</div>
+      <div class="swatch-row"><span class="swatch" style="background:#1F4477"></span><span class="swatch-name">--accent</span><span class="swatch-hex">#2C5BA0</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#6FA5F0"></span><span class="swatch-name">--accent-hi</span><span class="swatch-hex">#4A7FCF</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#4A7FCF"></span><span class="swatch-name">--accent-lo</span><span class="swatch-hex">#6FA5F0</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#2C5BA0"></span><span class="swatch-name">--accent-deep</span><span class="swatch-hex">#1F4477</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:rgba(44,91,160,0.12); border-color:#B8C0CF"></span><span class="swatch-name">--accent-glow</span><span class="swatch-hex">rgba 12%</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:rgba(44,91,160,0.05); border-color:#B8C0CF"></span><span class="swatch-name">--accent-tint</span><span class="swatch-hex">rgba 5%</span></div>
+    </div>
+
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">04</span> Status</div>
+      <div class="swatch-row"><span class="swatch" style="background:#2E8B5D"></span><span class="swatch-name">--success</span><span class="swatch-hex">#2E8B5D</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#B8830A"></span><span class="swatch-name">--warning</span><span class="swatch-hex">#B8830A</span></div>
+      <div class="swatch-row"><span class="swatch" style="background:#B8423D"></span><span class="swatch-name">--danger</span><span class="swatch-hex">#B8423D</span></div>
+    </div>
+  </div>
+
+  <div class="subhead"><span class="num">04</span><span>Typography</span></div>
+  <div class="token-grid">
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">A</span> Source Serif 4 — page titles only</div>
+      <div class="type-row">
+        <span class="type-tag">H1 / 32px</span>
+        <span class="type-sample-serif">Maniple Research</span>
+      </div>
+      <div class="type-row">
+        <span class="type-tag">H2 / 26px</span>
+        <span class="type-sample-serif" style="font-size:24px;">Customers · 13 records</span>
+      </div>
+      <p style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-dim); letter-spacing:0.04em; margin-top:14px; line-height:1.7;">
+        // sanctum lineage. used <em>only</em> for page-level h1 + section headings — not body, never mono.
+      </p>
+    </div>
+    <div class="token-panel">
+      <div class="token-panel-title"><span class="pnum">B</span> Inter Tight — body &amp; UI</div>
+      <div class="type-row">
+        <span class="type-tag">Body / 14.5px</span>
+        <span class="type-sample-sans">Owner email, household name, free-text fields, button labels.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-tag">Strong / 600</span>
+        <span class="type-sample-sans" style="font-weight:600">Johnson family · active · 1 member</span>
+      </div>
+    </div>
+    <div class="token-panel" style="grid-column: 1 / -1;">
+      <div class="token-panel-title"><span class="pnum">C</span> JetBrains Mono — labels, status, identifiers, JSON</div>
+      <div class="type-row">
+        <span class="type-tag">Mono label</span>
+        <span class="type-sample-mono">SIGNED IN AS · ROLE SUPERADMIN · TIP_SEQ 124</span>
+      </div>
+      <div class="type-row">
+        <span class="type-tag">Mono code</span>
+        <span class="type-sample-mono" style="color:var(--text); letter-spacing:0; font-size:13px;">service.outbox.email_dispatch.enabled</span>
+      </div>
+      <div class="type-row">
+        <span class="type-tag">Mono nav</span>
+        <span class="type-sample-mono" style="font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-muted);">DASHBOARD &nbsp; CUSTOMERS &nbsp; INVITATIONS &nbsp; FLAGS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 02 — BRAND MARK ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 02</span><span>Brand mark</span></div>
+  <h2 class="section-title">Three rotated squares.</h2>
+  <p class="section-blurb">
+    Maniple is marked by three nested rotated squares — a reference to
+    the three boards of the game Azad in Iain M.&nbsp;Banks's <em>The Player of
+    Games</em>. <strong>Use the Full variant by default.</strong> Fall back
+    to Compact only when Full becomes illegible — typically below ~28px,
+    where the three frames collapse into noise. Medium is a transitional
+    variant; reach for it rarely. Stroke color inherits from
+    <code>currentColor</code>; the inner diamond uses <code>--accent</code>.
+  </p>
+
+  <div class="lm-variants">
+    <div class="lm-variant">
+      <div class="specimen" style="color: var(--text);">
+        <svg viewBox="0 0 100 100" width="80" height="80" aria-hidden="true">
+          <g transform="translate(50 50)">
+            <rect x="-32" y="-32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="0.9"/>
+            <rect x="-26" y="-26" width="52" height="52" transform="rotate(22.5)" fill="none" stroke="currentColor" stroke-width="0.9"/>
+            <rect x="-15" y="-15" width="30" height="30" transform="rotate(45)" fill="var(--accent)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Full <span style="color: var(--accent); font-weight: 700;">· default</span></div>
+      <div class="range">28px and up</div>
+      <p class="blurb">Three frames at 0°, 22.5°, 45°. Default for every surface — hero placements, page headers, navigation, splash screens.</p>
+    </div>
+
+    <div class="lm-variant">
+      <div class="specimen" style="color: var(--text);">
+        <svg viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
+          <g transform="translate(50 50)">
+            <rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Compact</div>
+      <div class="range">below 28px</div>
+      <p class="blurb">Fallback only. Single thick frame, enlarged inner. Favicons, 16px nav glyphs, small chips where Full collapses into noise.</p>
+    </div>
+
+    <div class="lm-variant">
+      <div class="specimen" style="color: var(--text);">
+        <svg viewBox="0 0 100 100" width="72" height="72" aria-hidden="true">
+          <g transform="translate(50 50)">
+            <rect x="-30" y="-30" width="60" height="60" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <rect x="-15" y="-15" width="30" height="30" transform="rotate(45)" fill="var(--accent)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Medium</div>
+      <div class="range">rarely</div>
+      <p class="blurb">Transitional variant — single frame at standard stroke. Reach for it only when Compact's thicker stroke reads heavy and Full is still illegible.</p>
+    </div>
+
+    <div class="lm-variant">
+      <div class="specimen" style="color: var(--text);">
+        <svg viewBox="0 0 100 100" width="80" height="80" aria-hidden="true">
+          <g transform="translate(50 50)">
+            <rect x="-36" y="-36" width="72" height="72" fill="none" stroke="currentColor" stroke-width="0.7"/>
+            <rect x="-32" y="-32" width="64" height="64" transform="rotate(11.25)" fill="none" stroke="currentColor" stroke-width="0.8"/>
+            <rect x="-26" y="-26" width="52" height="52" transform="rotate(22.5)" fill="none" stroke="currentColor" stroke-width="1"/>
+            <rect x="-15" y="-15" width="30" height="30" transform="rotate(45)" fill="var(--accent)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Specimen</div>
+      <div class="range">spec sheet only</div>
+      <p class="blurb">Four-frame construction reference. Print specs and brand documentation; never used in product.</p>
+    </div>
+  </div>
+
+  <p class="section-blurb">
+    Wordmark lockup. The large size pairs the Full mark with the
+    wordmark; the smaller sizes fall back to Compact where Full would
+    be illegible. The trailing period is always <code>--accent</code>;
+    the glyph color inherits <code>currentColor</code> so the lockup
+    tracks with surrounding text color.
+  </p>
+  <div class="wordmark-grid">
+    <div class="wordmark-cell sm">
+      <svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="2"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg>
+      <span class="wordmark-name">Maniple<span class="wordmark-dot">.</span></span>
+    </div>
+    <div class="wordmark-cell md">
+      <svg viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="2"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg>
+      <span class="wordmark-name">Maniple<span class="wordmark-dot">.</span></span>
+    </div>
+    <div class="wordmark-cell lg">
+      <svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true"><g transform="translate(50 50)"><rect x="-32" y="-32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="0.9"/><rect x="-26" y="-26" width="52" height="52" transform="rotate(22.5)" fill="none" stroke="currentColor" stroke-width="0.9"/><rect x="-15" y="-15" width="30" height="30" transform="rotate(45)" fill="var(--accent)"/></g></svg>
+      <span class="wordmark-name">Maniple<span class="wordmark-dot">.</span></span>
+    </div>
+  </div>
+  <p class="caption">
+    // glyph color inherits via <code>currentColor</code>; the trailing period is always <code>--accent</code>. The standalone <code>maniple-logo-files/</code> document is deprecated — these variants are the canonical reference.
+  </p>
+</section>
+<!-- ============== FIG 03 — DASHBOARD ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 03</span><span>Dashboard</span></div>
+  <h2 class="section-title">System status, made legible.</h2>
+  <p class="section-blurb">
+    The current dashboard is a ladder of plain <code>ok</code> chips with raw JSON glued to the right.
+    Atlas Console keeps that exact information density — nothing is removed — but reads it like a
+    log line: identity strip up top, mono-keyed status rows below, JSON syntax-highlighted in place.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand">
+        <svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg>
+        <span class="name">Maniple<span class="dot">.</span></span>
+      </div>
+      <nav class="app-nav">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta">
+        <span class="who"><strong>sean@maniple.test</strong> · superadmin</span>
+      </div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;OPS · OVERVIEW</div>
+          <h1>Dashboard</h1>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-secondary">Refresh</button>
+          <button class="btn btn-primary">Run diagnostic</button>
+        </div>
+      </div>
+
+      <div class="subhead"><span class="num">01</span><span>Identity</span></div>
+      <div class="identity-strip">
+        <div class="identity-cell">
+          <div class="label">Signed in as</div>
+          <div class="value">sean@maniple.test</div>
+        </div>
+        <div class="identity-cell">
+          <div class="label">Role</div>
+          <div class="value" style="color:var(--accent)">superadmin</div>
+        </div>
+        <div class="identity-cell">
+          <div class="label">Session</div>
+          <div class="value muted">14h 22m · expires 03:14 UTC</div>
+        </div>
+      </div>
+
+      <div class="subhead"><span class="num">02</span><span>System status</span></div>
+      <div class="status-grid">
+        <div class="status-row overall">
+          <span class="label">Overall</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json"><span class="cmt">// all subsystems reporting healthy</span></span>
+        </div>
+        <div class="status-row">
+          <span class="label">postgres</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json">{ <span class="k">"ok"</span>: <span class="b">true</span>, <span class="k">"latency_ms"</span>: <span class="n">0</span> }</span>
+        </div>
+        <div class="status-row">
+          <span class="label">redis</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json">{ <span class="k">"ok"</span>: <span class="b">true</span>, <span class="k">"latency_ms"</span>: <span class="n">0</span> }</span>
+        </div>
+        <div class="status-row">
+          <span class="label">sanctum</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json">{ <span class="k">"ok"</span>: <span class="b">true</span>, <span class="k">"latency_ms"</span>: <span class="n">0</span> }</span>
+        </div>
+        <div class="status-row">
+          <span class="label">outbox</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json">{ <span class="k">"pending"</span>: <span class="n">0</span>, <span class="k">"error"</span>: <span class="n">0</span>, <span class="k">"oldest_pending_age_s"</span>: <span class="nl">null</span> }</span>
+        </div>
+        <div class="status-row">
+          <span class="label">audit_chain</span>
+          <span class="badge badge-ok">ok</span>
+          <span class="json">{ <span class="k">"tip_seq"</span>: <span class="n">112</span>, <span class="k">"tip_ts"</span>: <span class="s">"2026-04-29T03:43:28.476682+00:00"</span> }</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 04 — CUSTOMERS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 04</span><span>Customers</span></div>
+  <h2 class="section-title">The list view, treated as a record.</h2>
+  <p class="section-blurb">
+    Tables are where the admin lives. Mono headers in caps, dashed row dividers,
+    surface-shift on hover, owner emails in accent so they read as the clickable
+    identity. Status sits in a mono badge — same vocabulary used everywhere else in the app.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#" class="active">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;DIRECTORY · HOUSEHOLDS</div>
+          <h1>Customers</h1>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-secondary">Export</button>
+          <button class="btn btn-primary">+ New customer</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <select class="select"><option>all</option><option>active</option><option>suspended</option><option>archived</option></select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Search</span>
+          <input class="input w-md" placeholder="name or owner email" />
+        </div>
+        <div class="filter-meta"><strong>13</strong> customer(s)</div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Owner</th>
+            <th class="num">Members</th>
+            <th>Legal hold</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Johnson family</td>     <td><span class="badge badge-ok">active</span></td>      <td class="email">robert@johnson.test</td>     <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Nakamura family</td>    <td><span class="badge badge-ok">active</span></td>      <td class="email">ryan@nakamura.test</td>     <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Worthington family</td> <td><span class="badge badge-ok">active</span></td>      <td class="email">tyler@worthington.test</td> <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Chen family</td>        <td><span class="badge badge-warn">suspended</span></td> <td class="email">greg@chen.test</td>          <td class="num">1</td><td><span class="badge-flat true">held</span></td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Davis family</td>       <td><span class="badge badge-ok">active</span></td>      <td class="email">eleanor@davis.test</td>     <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Park family</td>        <td><span class="badge badge-ok">active</span></td>      <td class="email">jin@park.test</td>          <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Kim family</td>         <td><span class="badge badge-ok">active</span></td>      <td class="email">sarah@kim.test</td>         <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Ruiz family</td>        <td><span class="badge badge-ok">active</span></td>      <td class="email">maria@ruiz.test</td>        <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Hernandez family</td>   <td><span class="badge badge-ok">active</span></td>      <td class="email">patricia@hernandez.test</td><td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Johal family</td>       <td><span class="badge badge-ok">active</span></td>      <td class="email">anika@johal.test</td>       <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Mehta family</td>       <td><span class="badge badge-ok">active</span></td>      <td class="email">arjun@mehta.test</td>       <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Webb family</td>        <td><span class="badge badge-error">archived</span></td> <td class="email">marcus@webb.test</td>       <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+          <tr><td>Rivera family</td>      <td><span class="badge badge-ok">active</span></td>      <td class="email">alex@rivera.test</td>       <td class="num">1</td><td class="mono">—</td>     <td class="actions"><a class="t-link">Open ↗</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 05 — DIAGNOSTICS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 05</span><span>Diagnostics</span></div>
+  <h2 class="section-title">Action-first, never decorative.</h2>
+  <p class="section-blurb">
+    Diagnostics is a list of named tools, each with a verb. The mono <code>name.with_dots</code>
+    becomes the visual anchor in accent — your eye lands there first — followed by a plain-text
+    description and a single primary action on the right.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#" class="active">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;OPS · DIAGNOSTICS</div>
+          <h1>Diagnostics</h1>
+        </div>
+      </div>
+
+      <p class="action-note">
+        // every run is recorded in the audit log as <code>admin.ops.diagnostic_run</code>.
+      </p>
+
+      <div class="action-list">
+        <div class="action-row">
+          <div class="a-name">audit.verify_tail</div>
+          <button class="btn btn-secondary btn-sm">Run ▸</button>
+          <div class="a-desc">Verify the last N events of the hash-chained audit log.</div>
+        </div>
+        <div class="action-row">
+          <div class="a-name">sanctum.ping</div>
+          <button class="btn btn-secondary btn-sm">Run ▸</button>
+          <div class="a-desc">Call the Sanctum <code style="font-family:var(--font-mono);color:var(--accent);font-size:12px;">/healthz</code> endpoint to confirm reachability.</div>
+        </div>
+        <div class="action-row">
+          <div class="a-name">outbox.inspect</div>
+          <button class="btn btn-secondary btn-sm">Run ▸</button>
+          <div class="a-desc">Counts of outbox_jobs by status + age of oldest pending/error.</div>
+        </div>
+        <div class="action-row">
+          <div class="a-name">session.count</div>
+          <button class="btn btn-secondary btn-sm">Run ▸</button>
+          <div class="a-desc">Lower-bound count of live sessions in Redis (capped at 5000).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 06 — STATUS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 06</span><span>Status (raw)</span></div>
+  <h2 class="section-title">JSON, owned and styled.</h2>
+  <p class="section-blurb">
+    The current Status page is a wall of unstyled JSON. We don't dumb it down — operators
+    want to read the actual response — we just frame it as a real terminal block, syntax-color it,
+    and put the auto-refresh state in the title bar where it belongs.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#" class="active">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;OPS · LIVE</div>
+          <h1>System status <span style="color:var(--success); font-family:var(--font-mono); font-size:18px; letter-spacing:0.04em; margin-left:10px;">▸ ok</span></h1>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-head">
+          <span>GET&nbsp;/admin/status.json</span>
+          <span class="meta"><span class="accent">●</span> &nbsp;auto-refresh · 10s</span>
+          <span class="dots"><span></span><span></span><span></span></span>
+        </div>
+<pre class="term-body">{
+  <span class="k">"postgres"</span>: {
+    <span class="k">"ok"</span>:         <span class="b">true</span>,
+    <span class="k">"latency_ms"</span>: <span class="n">0</span>
+  },
+  <span class="k">"redis"</span>: {
+    <span class="k">"ok"</span>:         <span class="b">true</span>,
+    <span class="k">"latency_ms"</span>: <span class="n">0</span>
+  },
+  <span class="k">"sanctum"</span>: {
+    <span class="k">"ok"</span>:         <span class="b">true</span>,
+    <span class="k">"latency_ms"</span>: <span class="n">0</span>
+  },
+  <span class="k">"outbox"</span>: {
+    <span class="k">"pending"</span>:              <span class="n">0</span>,
+    <span class="k">"error"</span>:                <span class="n">0</span>,
+    <span class="k">"oldest_pending_age_s"</span>: <span class="nl">null</span>
+  },
+  <span class="k">"audit_chain"</span>: {
+    <span class="k">"tip_seq"</span>: <span class="n">124</span>,
+    <span class="k">"tip_ts"</span>:  <span class="s">"2026-04-29T03:44:39.055466+00:00"</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 07 — TOGGLES ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 07</span><span>Service toggles</span></div>
+  <h2 class="section-title">Boolean state, made obvious.</h2>
+  <p class="section-blurb">
+    True/false in green/dim mono so the room can read it from across the desk. Timestamps in
+    a separate column with their own typographic register. Single, weight-y "Flip" action per row.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#" class="active">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;CONTROL · SERVICES</div>
+          <h1>Service toggles</h1>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group" style="flex:1">
+          <span class="filter-label">New key</span>
+          <input class="input w-lg" placeholder="service.x.enabled" />
+        </div>
+        <button class="btn btn-primary">Create ▸</button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Enabled</th>
+            <th>Updated</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono" style="color:var(--text);">service.outbox.email_dispatch.enabled</td>
+            <td><span class="badge-flat false">false</span></td>
+            <td class="mono">2026-04-28 · 14:35:05</td>
+            <td class="actions"><button class="btn btn-secondary btn-sm">Flip ▸</button></td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:var(--text);">service.invitations.send.enabled</td>
+            <td><span class="badge-flat true">true</span></td>
+            <td class="mono">2026-04-22 · 09:18:44</td>
+            <td class="actions"><button class="btn btn-secondary btn-sm">Flip ▸</button></td>
+          </tr>
+          <tr>
+            <td class="mono" style="color:var(--text);">service.audit.background_verify.enabled</td>
+            <td><span class="badge-flat true">true</span></td>
+            <td class="mono">2026-04-12 · 21:02:11</td>
+            <td class="actions"><button class="btn btn-secondary btn-sm">Flip ▸</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 08 — BANNER ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 08</span><span>Maintenance banner</span></div>
+  <h2 class="section-title">A form that shows its work.</h2>
+  <p class="section-blurb">
+    The current page is a textarea, a level dropdown, and two buttons floating on white.
+    Atlas Console gives the same form a frame, mono labels for the fields, and — critically —
+    a live preview of how the banner will actually appear to customers in Sanctum.
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#" class="active">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;CONTROL · BANNER</div>
+          <h1>Maintenance banner</h1>
+        </div>
+        <div class="head-actions">
+          <span class="badge badge-neutral">no banner active</span>
+        </div>
+      </div>
+
+      <div class="form-stack">
+        <div class="field-row">
+          <label>Banner message</label>
+          <textarea class="textarea" placeholder="e.g. Sanctum will be read-only between 02:00 and 02:30 UTC for a postgres failover.">Sanctum will be in read-only mode from 02:00 – 02:30 UTC for a routine postgres failover. Existing sessions will remain signed in.</textarea>
+          <span class="field-help">// rendered above the global nav in Sanctum &amp; Maniple Research surfaces.</span>
+        </div>
+        <div class="field-row" style="max-width:280px;">
+          <label>Level</label>
+          <select class="select"><option>info</option><option selected>warning</option><option>critical</option></select>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button class="btn btn-primary">Save banner ▸</button>
+          <button class="btn btn-secondary">Clear banner</button>
+        </div>
+
+        <div class="preview-pane">
+          <div class="ptag">Preview &nbsp;·&nbsp; sanctum.app/dashboard</div>
+          <div class="banner-mock">
+            <span class="b-tag">▸ Warning</span>
+            <span>Sanctum will be in read-only mode from 02:00 – 02:30 UTC for a routine postgres failover. Existing sessions will remain signed in.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 09 — INVITATIONS / FLAGS empty states ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 09</span><span>Empty states</span></div>
+  <h2 class="section-title">Nothing to show — said well.</h2>
+  <p class="section-blurb">
+    The live admin currently shows a header row with no body when a list is empty. Atlas Console
+    keeps the table scaffold and sets a single, mono empty-state inside the frame so it reads as
+    "we looked, there's nothing here" rather than "the page broke."
+  </p>
+
+  <div class="app-frame">
+    <div class="app-bar">
+      <div class="app-brand"><svg class="brand-glyph" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(50 50)"><rect x="-34" y="-34" width="68" height="68" transform="rotate(45)" fill="none" stroke="currentColor" stroke-width="3"/><rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" fill="var(--accent)"/></g></svg><span class="name">Maniple<span class="dot">.</span></span></div>
+      <nav class="app-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Customers</a>
+        <a href="#" class="active">Invitations</a>
+        <a href="#">Flags</a>
+        <a href="#">Banner</a>
+        <a href="#">Toggles</a>
+        <a href="#">Status</a>
+        <a href="#">Diagnostics</a>
+      </nav>
+      <div class="app-meta"><span class="who"><strong>sean@maniple.test</strong> · superadmin</span></div>
+    </div>
+
+    <div class="app-body">
+      <div class="page-head">
+        <div>
+          <div class="crumb"><span class="accent">▸</span> &nbsp;DIRECTORY · INVITES</div>
+          <h1>Invitations</h1>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <select class="select"><option>all</option><option>pending</option><option>accepted</option><option>expired</option></select>
+        </div>
+        <div class="filter-meta"><strong>0</strong> invitation(s)</div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Household</th>
+            <th>Role</th>
+            <th>State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" style="padding:0;"><div class="empty">▸ no invitations match this filter</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 10 — TAILWIND CONFIG ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 10</span><span>Tailwind handoff</span></div>
+  <h2 class="section-title">One config, every screen.</h2>
+  <p class="section-blurb">
+    Drop the snippet below into <code>tailwind.config.js</code>. Every token in this document
+    becomes a Tailwind utility — <code>bg-surface</code>, <code>text-accent</code>,
+    <code>border-border-soft</code>, <code>font-mono</code>, etc. — so the existing admin can be
+    migrated screen-by-screen without changing component structure.
+  </p>
+
+  <div class="config-block">
+    <div class="config-head">
+      <span>tailwind.config.js</span>
+      <span class="lang">JS</span>
+    </div>
+<pre class="config-body"><span class="cm">/** @type {import('tailwindcss').Config} */</span>
+<span class="kw">module.exports</span> = {
+  <span class="pn">content</span>: [<span class="v">'./app/**/*.{html,js,ts,tsx,jsx,erb}'</span>],
+  <span class="pn">theme</span>: {
+    <span class="pn">extend</span>: {
+      <span class="pn">colors</span>: {
+        <span class="cm" data-theme-only="light">// ─ surfaces (near-white greys)</span><span class="cm" data-theme-only="dark">// ─ surfaces (navy-tinted darks)</span>
+        <span class="pn">bg</span>:           <span class="v">'#0B0E15'</span>,
+        <span class="pn">surface</span>:      <span class="v">'#141826'</span>,
+        <span class="pn">'surface-2'</span>:  <span class="v">'#1C2231'</span>,
+        <span class="pn">'surface-3'</span>:  <span class="v">'#242B3D'</span>,
+        <span class="pn">'surface-code'</span>: <span class="v">'#07090E'</span>,
+
+        <span class="cm">// ─ borders</span>
+        <span class="pn">border</span>:       <span class="v">'#2A3247'</span>,
+        <span class="pn">'border-soft'</span>: <span class="v">'#1E2535'</span>,
+        <span class="pn">'border-hi'</span>:   <span class="v">'#3A445F'</span>,
+
+        <span class="cm">// ─ text</span>
+        <span class="pn">text</span>:         <span class="v">'#E8EAF0'</span>,
+        <span class="pn">'text-muted'</span>: <span class="v">'#8C95AB'</span>,
+        <span class="pn">'text-dim'</span>:   <span class="v">'#5A6178'</span>,
+
+        <span class="cm" data-theme-only="light">// ─ accent (sanctum azure, dropped for light)</span><span class="cm" data-theme-only="dark">// ─ accent (sanctum azure, lifted for dark)</span>
+        <span class="pn">accent</span>: {
+          <span class="pn">DEFAULT</span>: <span class="v">'#6FA5F0'</span>,
+          <span class="pn">hi</span>:      <span class="v">'#92BEFF'</span>,
+          <span class="pn">lo</span>:      <span class="v">'#4A7FCF'</span>,
+          <span class="pn">deep</span>:    <span class="v">'#2C5BA0'</span>,
+          <span class="pn">ink</span>:     <span class="v">'#050A14'</span>,
+        },
+
+        <span class="cm">// ─ status</span>
+        <span class="pn">success</span>: <span class="v">'#5BC68A'</span>,
+        <span class="pn">warning</span>: <span class="v">'#E8B547'</span>,
+        <span class="pn">danger</span>:  <span class="v">'#E55B71'</span>,
+      },
+      <span class="pn">backgroundColor</span>: {
+        <span class="pn">'accent-glow'</span>: <span class="v">'rgba(111,165,240,0.18)'</span>,
+        <span class="pn">'accent-tint'</span>: <span class="v">'rgba(111,165,240,0.08)'</span>,
+        <span class="pn">'success-tint'</span>: <span class="v">'rgba(91,198,138,0.12)'</span>,
+        <span class="pn">'warning-tint'</span>: <span class="v">'rgba(232,181,71,0.12)'</span>,
+        <span class="pn">'danger-tint'</span>:  <span class="v">'rgba(229,91,113,0.12)'</span>,
+      },
+      <span class="pn">fontFamily</span>: {
+        <span class="pn">sans</span>:  [<span class="v">'"Inter Tight"'</span>, <span class="v">'ui-sans-serif'</span>, <span class="v">'system-ui'</span>],
+        <span class="pn">mono</span>:  [<span class="v">'"JetBrains Mono"'</span>, <span class="v">'ui-monospace'</span>, <span class="v">'Menlo'</span>],
+        <span class="pn">serif</span>: [<span class="v">'"Source Serif 4"'</span>, <span class="v">'Georgia'</span>, <span class="v">'serif'</span>],
+      },
+      <span class="pn">letterSpacing</span>: {
+        <span class="pn">label</span>:  <span class="v">'0.18em'</span>,  <span class="cm">// mono caps labels</span>
+        <span class="pn">nav</span>:    <span class="v">'0.16em'</span>,  <span class="cm">// nav links</span>
+        <span class="pn">heading</span>: <span class="v">'-0.022em'</span>, <span class="cm">// serif h1/h2</span>
+      },
+      <span class="pn">boxShadow</span>: {
+        <span class="pn">focus</span>: <span class="v">'0 0 0 3px rgba(111,165,240,0.18)'</span>,
+        <span class="pn">card</span>:  <span class="v">'0 30px 60px -30px rgba(0,0,0,0.6)'</span>,
+      },
+      <span class="pn">borderRadius</span>: {
+        <span class="cm">// atlas console keeps things sharp — radii are deliberate exceptions</span>
+        <span class="pn">DEFAULT</span>: <span class="v">'0'</span>,
+      },
+    },
+  },
+}</pre>
+  </div>
+
+  <div class="subhead" style="margin-top:36px;"><span class="num">↳</span><span>Pattern → utilities cheat sheet</span></div>
+
+  <div class="config-block">
+    <div class="config-head">
+      <span>common patterns</span>
+      <span class="lang">HTML</span>
+    </div>
+<pre class="config-body"><span class="cm">/* mono section label */</span>
+&lt;div <span class="kw">class</span>=<span class="v">"font-mono text-[10.5px] uppercase tracking-label text-text-dim"</span>&gt;
+  <span class="kw">&lt;span</span> <span class="kw">class</span>=<span class="v">"text-accent font-semibold"</span><span class="kw">&gt;</span>Fig. 03<span class="kw">&lt;/span&gt;</span> &nbsp;Dashboard
+&lt;/div&gt;
+
+<span class="cm">/* page H1 (sanctum serif accent) */</span>
+&lt;h1 <span class="kw">class</span>=<span class="v">"font-serif text-[32px] font-semibold tracking-heading"</span>&gt;Customers&lt;/h1&gt;
+
+<span class="cm">/* primary button */</span>
+&lt;button <span class="kw">class</span>=<span class="v">"font-mono text-[11px] uppercase tracking-label
+  px-4 py-2 bg-accent text-accent-ink font-semibold
+  hover:bg-accent-hi hover:shadow-focus transition"</span>&gt;Run ▸&lt;/button&gt;
+
+<span class="cm">/* mono status badge */</span>
+&lt;span <span class="kw">class</span>=<span class="v">"font-mono text-[10px] uppercase tracking-label font-semibold
+  px-2 py-0.5 text-success bg-success-tint border border-success/30"</span>&gt;ok&lt;/span&gt;
+
+<span class="cm">/* data-table row hover */</span>
+&lt;tr <span class="kw">class</span>=<span class="v">"hover:bg-surface-3"</span>&gt;...&lt;/tr&gt;
+
+<span class="cm">/* faint global grid (apply to body or app shell) */</span>
+&lt;body <span class="kw">class</span>=<span class="v">"bg-bg text-text font-sans
+  bg-[repeating-linear-gradient(0deg,transparent_0_31px,var(--grid-major)_31px_32px),repeating-linear-gradient(90deg,transparent_0_31px,var(--grid-minor)_31px_32px)]"</span>&gt;</pre>
+  </div>
+</section>
+
+
+<!-- ============== FIG 11 — SIDEBAR SHELL ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 11</span><span>Sidebar shell</span></div>
+  <h2 class="section-title">The side-nav variant.</h2>
+  <p class="section-blurb">
+    <code>.app-bar</code> handles top-nav. For sidebar layouts — the shape
+    every Maniple consumer surface ended up wanting — use <code>.shell</code> /
+    <code>.shell-sidebar</code> / <code>.shell-main</code>. The active <code>.sidebar-link</code>
+    uses a 3px left bar plus <code>--accent-tint</code> bg, the side-nav analogue
+    of the top-nav 2px top stripe.
+  </p>
+
+  <div class="app-frame">
+    <div style="display: flex; min-height: 360px; background: var(--bg);">
+      <div style="width: 200px; background: var(--surface-3); border-right: 1px solid var(--border); padding: 14px 0;">
+        <div class="sidebar-section-label">Recent</div>
+        <a href="#" class="sidebar-link">Mortgage dominates housing</a>
+        <a href="#" class="sidebar-link">$780/yr to reclaim</a>
+        <a href="#" class="sidebar-link">Roth conversion timing</a>
+        <div class="sidebar-section-label" style="margin-top: 18px;">Vault</div>
+        <a href="#" class="sidebar-link active">Accounts</a>
+        <a href="#" class="sidebar-link">Documents</a>
+      </div>
+      <div style="flex: 1; padding: 28px 32px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim);">
+        ▸ Main content column
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 12 — POPOVER SURFACE ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 12</span><span>Popover surface</span></div>
+  <h2 class="section-title">One surface, three menus.</h2>
+  <p class="section-blurb">
+    Profile menu, attach popover, kebab row-menu all share the same
+    visual shell: <code>.popover-surface</code> (white, 1px border, soft
+    drop shadow) with <code>.popover-item</code> rows.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+    <div>
+      <div class="fig-label" style="margin-bottom: 12px;"><span class="num">A</span><span>Profile menu</span></div>
+      <div class="popover-surface" style="position: static; width: 240px;">
+        <div class="popover-header">arjun@mehta.example</div>
+        <a href="#" class="popover-item">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M3 16c1-3 3.5-5 6-5s5 2 6 5"/></svg>
+          <span class="label">Profile</span>
+        </a>
+        <a href="#" class="popover-item">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2L4 4v5c0 4 2.5 6.5 5 7.5 2.5-1 5-3.5 5-7.5V4z"/></svg>
+          <span class="label">Security</span>
+        </a>
+        <div class="popover-divider"></div>
+        <button class="popover-item" type="button">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7"/><path d="M9 9h8"/><polyline points="14,6 17,9 14,12"/></svg>
+          <span class="label">Log out</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="fig-label" style="margin-bottom: 12px;"><span class="num">B</span><span>Attach (with shortcuts)</span></div>
+      <div class="popover-surface" style="position: static; width: 260px;">
+        <button class="popover-item is-focus" type="button">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 9l-4 4a3 3 0 0 1-4-4l5-5a2 2 0 0 1 3 3l-5 5"/></svg>
+          <span class="label">Add file to chat</span>
+          <span class="shortcut">⌘U</span>
+        </button>
+        <button class="popover-item" type="button">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2L4 4v5c0 4 2.5 6.5 5 7.5 2.5-1 5-3.5 5-7.5V4z"/><path d="M6.5 9l2 2 3-3"/></svg>
+          <span class="label">Add file to Vault</span>
+          <span class="shortcut">⌘⇧U</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="fig-label" style="margin-bottom: 12px;"><span class="num">C</span><span>Kebab row-menu</span></div>
+      <div class="popover-surface" style="position: static; width: 180px;">
+        <button class="popover-item" type="button">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v8"/><polyline points="4,7 8,11 12,7"/><path d="M3 13h10"/></svg>
+          <span class="label">Download</span>
+        </button>
+        <button class="popover-item" type="button">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="3"/><path d="M3 6v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6"/></svg>
+          <span class="label">Archive</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 13 — ROW-LIST ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 13</span><span>Row-list</span></div>
+  <h2 class="section-title">Rich rows, not a table.</h2>
+  <p class="section-blurb">
+    <code>.data-table</code> works when every row has the same shape across
+    aligned columns. When each row is its own little object — title +
+    chips + multi-line meta + value — the table breaks down. Use
+    <code>.row-list</code> with <code>.row .main</code> and <code>.row .balance</code>.
+  </p>
+
+  <div class="row-list">
+    <div class="row">
+      <div class="main">
+        <div class="title"><a href="#">Chase Sapphire Reserve</a> <span class="badge">credit · revolving</span> <span class="badge">tax: taxable</span></div>
+        <div class="meta">JPMorgan Chase · USD · •••• 4421 · added Mar 12, 2026</div>
+      </div>
+      <div class="balance">
+        <div class="balance-value">−$4,381.22</div>
+        <div class="balance-as-of">as of yesterday</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="main">
+        <div class="title"><a href="#">Fidelity Brokerage</a> <span class="badge">investment · brokerage</span></div>
+        <div class="meta">Fidelity Investments · USD · •••• 6309 · added Feb 14, 2026</div>
+      </div>
+      <div class="balance">
+        <div class="balance-value">$8,142,309.74</div>
+        <div class="balance-as-of">as of yesterday</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 14 — CARD WITH HEAD + FOOT ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 14</span><span>Card with head + foot</span></div>
+  <h2 class="section-title">Three-slot frame.</h2>
+  <p class="section-blurb">
+    <code>.app-frame</code> + <code>.frame-head</code> + body content + <code>.frame-foot</code>.
+    The head strip uses <code>--surface-code</code>; the foot uses
+    <code>--surface-2</code> with a top border. Lets every section share a
+    consistent shape regardless of what fills the body.
+  </p>
+
+  <section class="app-frame">
+    <div class="frame-head">
+      <div class="frame-head-title">Profile</div>
+      <div class="frame-head-meta">Mehta household <span class="sep">·</span> <span class="accent">Owner</span></div>
+    </div>
+    <div style="padding: 18px 22px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">
+      ▸ Form content, table, list, anything goes here.
+    </div>
+    <div class="frame-foot">
+      <button type="button" class="btn btn-primary">Save changes</button>
+      <button type="button" class="btn btn-ghost">Cancel</button>
+    </div>
+  </section>
+</section>
+
+<!-- ============== FIG 15 — SEGMENTED + BOOLEAN ATTRS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 15</span><span>Segmented + boolean attrs</span></div>
+  <h2 class="section-title">Two micro-controls.</h2>
+  <p class="section-blurb">
+    A binary state selector and a row-level boolean indicator —
+    common enough that re-inventing them each time wastes design budget.
+  </p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+    <div>
+      <div class="fig-label" style="margin-bottom: 12px;"><span class="num">A</span><span>Segmented control</span></div>
+      <div class="seg-control" role="radiogroup" style="max-width: 240px;">
+        <label class="seg-option"><input type="radio" name="seg-demo" checked /><span>Member</span></label>
+        <label class="seg-option"><input type="radio" name="seg-demo" /><span>Owner</span></label>
+      </div>
+    </div>
+
+    <div>
+      <div class="fig-label" style="margin-bottom: 12px;"><span class="num">B</span><span>Boolean attributes</span></div>
+      <div class="attr-list">
+        <span class="attr is-on">
+          <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,7 6,10 11,4"/></svg>
+          Redacted
+        </span>
+        <span class="attr"><span class="attr-dash">—</span>Tokenized</span>
+        <span class="attr"><span class="attr-dash">—</span>Archived</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FIG 16 — CENTERED PANE / SIGN-IN ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 16</span><span>Centered pane</span></div>
+  <h2 class="section-title">A surface outside the frame.</h2>
+  <p class="section-blurb">
+    Sign-in, error, invite-confirm: these screens don't fit
+    <code>.doc-section</code> or <code>.app-frame</code>. Use
+    <code>.centered-pane</code> + <code>.centered-card</code> — a narrow
+    card centered in the viewport with an optional flanked-rule
+    crumb above it.
+  </p>
+
+  <div class="app-frame" style="padding: 0;">
+    <div style="background: var(--bg); padding: 48px 0;">
+      <div class="centered-card" style="margin: 0 auto;">
+        <div class="crumb">Maniple — Invitation</div>
+        <h1>Join the Mehta household.</h1>
+        <p class="tagline">Arjun Mehta invited you to Maniple as a Member.</p>
+        <a href="#" class="btn btn-primary" style="width: 100%; text-align: center;">Accept invitation</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============== FIG 17 — SPINNERS ============== -->
+<section class="doc-section">
+  <div class="fig-label"><span class="num">Fig. 17</span><span>Spinners</span></div>
+  <h2 class="section-title">Three motions, one mark.</h2>
+  <p class="section-blurb">
+    Indeterminate loading. Each spinner reuses the brand-mark geometry —
+    same nested-squares system as Fig 02, animated. SMIL is baked into
+    each symbol so the motion plays without CSS or JavaScript. Pick the
+    variant whose feel matches the wait: <strong>orbit</strong> for
+    active/mechanical, <strong>pulse</strong> for steady/calm,
+    <strong>dwell</strong> for considered/deliberate (the most on-brand).
+    Color inherits via <code>currentColor</code> + <code>--accent</code>.
+  </p>
+
+  <div class="spinner-row">
+    <div class="meta">
+      <h3>Orbit</h3>
+      <p>Three layers spinning in alternating directions at different speeds.
+         The contrary motion reads as a layered mechanism.</p>
+      <div class="range"><strong>24–48 px</strong> &middot; active &middot; mechanical</div>
+    </div>
+    <div class="spinner-sizes">
+      <div class="spinner-cell"><div class="specimen"><svg width="16" height="16"><use href="#mn-spinner-orbit"/></svg></div><span class="label">16px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="24" height="24"><use href="#mn-spinner-orbit"/></svg></div><span class="label">24px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="32" height="32"><use href="#mn-spinner-orbit"/></svg></div><span class="label">32px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="48" height="48"><use href="#mn-spinner-orbit"/></svg></div><span class="label">48px</span></div>
+    </div>
+  </div>
+
+  <div class="spinner-row">
+    <div class="meta">
+      <h3>Pulse</h3>
+      <p>A single rotated frame spins slowly while the inner diamond
+         breathes in scale. Combined motion reads as calm and alive
+         without the noise of multiple rotating layers. Best at small sizes.</p>
+      <div class="range"><strong>16–32 px</strong> &middot; steady &middot; calm</div>
+    </div>
+    <div class="spinner-sizes">
+      <div class="spinner-cell"><div class="specimen"><svg width="16" height="16"><use href="#mn-spinner-pulse"/></svg></div><span class="label">16px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="24" height="24"><use href="#mn-spinner-pulse"/></svg></div><span class="label">24px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="32" height="32"><use href="#mn-spinner-pulse"/></svg></div><span class="label">32px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="48" height="48"><use href="#mn-spinner-pulse"/></svg></div><span class="label">48px</span></div>
+    </div>
+  </div>
+
+  <div class="spinner-row">
+    <div class="meta">
+      <h3>Dwell</h3>
+      <p>Rotation that moves in 90&deg; increments, pausing between each
+         move — a piece on a board stopping to consider before its next move.
+         The inner diamond stays still; the contrast against the moving frame
+         is the point. The most on-brand motion for Maniple.</p>
+      <div class="range"><strong>20–40 px</strong> &middot; considered &middot; deliberate</div>
+    </div>
+    <div class="spinner-sizes">
+      <div class="spinner-cell"><div class="specimen"><svg width="16" height="16"><use href="#mn-spinner-dwell"/></svg></div><span class="label">16px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="24" height="24"><use href="#mn-spinner-dwell"/></svg></div><span class="label">24px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="32" height="32"><use href="#mn-spinner-dwell"/></svg></div><span class="label">32px</span></div>
+      <div class="spinner-cell"><div class="specimen"><svg width="48" height="48"><use href="#mn-spinner-dwell"/></svg></div><span class="label">48px</span></div>
+    </div>
+  </div>
+
+  <p class="caption" style="margin-top: 20px;">
+    // each spinner is defined once as <code>&lt;symbol&gt;</code> in the sprite at the top of <code>&lt;body&gt;</code>. Reuse via <code>&lt;svg width="N"&gt;&lt;use href="#mn-spinner-orbit"/&gt;&lt;/svg&gt;</code>. The standalone <code>maniple-spinners-demo.html</code> is deprecated — this figure is the canonical reference.
+  </p>
+</section>
+<!-- ============== FOOTER ============== -->
+<footer class="doc-footer">
+  <span><strong>Atlas Console</strong> · v0.1 · April 2026</span>
+  <span><strong>Refs</strong> &nbsp; haraldr.com (form) &nbsp;·&nbsp; sanctum (palette)</span>
+</footer>
+
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var saved = (function () {
+    try { return localStorage.getItem('atlas-theme'); } catch (e) { return null; }
+  })() || 'light';
+  root.setAttribute('data-theme', saved);
+  function paint(t) {
+    document.querySelectorAll('.theme-toggle-btn').forEach(function (b) {
+      b.classList.toggle('is-active', b.dataset.setTheme === t);
+      b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false');
+    });
+  }
+  paint(saved);
+  document.querySelectorAll('.theme-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var t = btn.dataset.setTheme;
+      root.setAttribute('data-theme', t);
+      try { localStorage.setItem('atlas-theme', t); } catch (e) {}
+      paint(t);
+    });
+  });
+})();
+</script>
+</body>
+</html>

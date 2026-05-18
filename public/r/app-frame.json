@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "app-frame",
+  "description": "Atlas Console AppFrame — bordered chrome shell with lift-shadow and body grid overlay.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/atlas/app-frame.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nconst AppFrame = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(\n  ({ className, ...props }, ref) => (\n    <div\n      ref={ref}\n      className={cn(\n        \"bg-card border border-border overflow-hidden\",\n        \"shadow-[0_1px_0_var(--border-soft),0_30px_60px_-30px_rgba(0,0,0,0.6)]\",\n        className,\n      )}\n      {...props}\n    />\n  ),\n);\nAppFrame.displayName = \"AppFrame\";\n\nconst AppFrameBody = React.forwardRef<\n  HTMLDivElement,\n  React.HTMLAttributes<HTMLDivElement>\n>(({ className, children, ...props }, ref) => (\n  <div\n    ref={ref}\n    className={cn(\n      \"relative bg-card px-9 pt-9 pb-11\",\n      \"before:content-[''] before:absolute before:inset-0 before:pointer-events-none\",\n      \"before:bg-[repeating-linear-gradient(0deg,transparent_0_31px,var(--grid-minor)_31px_32px),repeating-linear-gradient(90deg,transparent_0_31px,var(--grid-major)_31px_32px)]\",\n      className,\n    )}\n    {...props}\n  >\n    <div className=\"relative\">{children}</div>\n  </div>\n));\nAppFrameBody.displayName = \"AppFrameBody\";\n\nexport { AppFrame, AppFrameBody };\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

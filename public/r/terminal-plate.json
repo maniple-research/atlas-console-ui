@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "terminal-plate",
+  "description": "Atlas Console TerminalPlate — recessed mono code/terminal block with optional label strip.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/atlas/terminal-plate.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\ninterface TerminalPlateProps extends React.HTMLAttributes<HTMLDivElement> {\n  label?: React.ReactNode;\n}\n\nconst TerminalPlate = React.forwardRef<HTMLDivElement, TerminalPlateProps>(\n  ({ className, label, children, ...props }, ref) => (\n    <div\n      ref={ref}\n      className={cn(\n        \"bg-surface-code border border-border-soft\",\n        \"font-mono text-[12px] leading-[1.55] text-foreground\",\n        \"shadow-[inset_0_1px_0_rgba(0,0,0,0.04)]\",\n        className,\n      )}\n      {...props}\n    >\n      {label ? (\n        <div className=\"px-3 py-1.5 border-b border-border-soft text-text-dim text-[10.5px] uppercase tracking-[0.18em]\">\n          {label}\n        </div>\n      ) : null}\n      <div className=\"px-3 py-2.5 overflow-x-auto\">{children}</div>\n    </div>\n  ),\n);\nTerminalPlate.displayName = \"TerminalPlate\";\n\nexport { TerminalPlate };\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

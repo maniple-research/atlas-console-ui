@@ -1,0 +1,293 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+/* ============================================================
+ * ATLAS CONSOLE — TOKENS
+ *
+ * Two layers:
+ *   1. Raw tokens (--bg, --accent, etc.) preserved from the
+ *      original design treatment so existing CSS using those
+ *      names continues to work.
+ *   2. shadcn standard tokens (--background, --primary, etc.)
+ *      mapped to the raw tokens so any shadcn component works
+ *      out of the box.
+ *
+ * Colors are kept as hex to preserve fidelity with the spec.
+ * Conversion to oklch is a non-breaking follow-up.
+ * ============================================================ */
+
+:root {
+  /* ─── ATLAS RAW TOKENS — LIGHT ─── */
+  --bg:           #F4F5F7;
+  --surface:      #FFFFFF;
+  --surface-2:    #FAFBFD;
+  --surface-3:    #EAEDF2;
+  --surface-code: #CCD3E0;
+  --surface-input:#FFFFFF;
+
+  --border-rgb:   #D4D8E0;
+  --border-soft:  #E8EAEF;
+  --border-hi:    #B8C0CF;
+
+  --text:         #0F1119;
+  --text-muted:   #5A6178;
+  --text-dim:     #8C95AB;
+
+  --accent-rgb:   #2C5BA0;
+  --accent-hi:    #4A7FCF;
+  --accent-lo:    #6FA5F0;
+  --accent-deep:  #1F4477;
+  --accent-glow:  rgba(44, 91, 160, 0.12);
+  --accent-tint:  rgba(44, 91, 160, 0.05);
+  --accent-ink:   #FFFFFF;
+
+  --success:      #2E8B5D;
+  --success-tint: rgba(46, 139, 93, 0.10);
+  --warning:      #B8830A;
+  --warning-tint: rgba(184, 131, 10, 0.12);
+  --danger:       #B8423D;
+  --danger-tint:  rgba(184, 66, 61, 0.10);
+
+  --grid-major:   rgba(15, 17, 25, 0.04);
+  --grid-minor:   rgba(15, 17, 25, 0.03);
+
+  --popover-shadow:
+    0 14px 32px rgba(15, 17, 25, 0.12),
+    0 1px 0 rgba(15, 17, 25, 0.04);
+
+  --font-sans:  var(--font-sans-loaded, "Inter Tight"), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:  var(--font-mono-loaded, "JetBrains Mono"), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: var(--font-serif-loaded, "Source Serif 4"), Georgia, "Times New Roman", serif;
+
+  --maxw: 1240px;
+  --gutter: clamp(20px, 4vw, 56px);
+  --radius: 0.25rem;
+
+  /* ─── SHADCN STANDARD TOKENS (mapped) ─── */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent-rgb);
+  --primary-foreground: var(--accent-ink);
+  --secondary: var(--surface-3);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-3);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --destructive-foreground: #FFFFFF;
+  --border: var(--border-rgb);
+  --input: var(--border-rgb);
+  --ring: var(--accent-rgb);
+
+  /* Categorical chart palette — distinct from status colors.
+     Sanctum azure anchor + analogous cools + one warm + one neutral. */
+  --chart-1: #2C5BA0;  /* sanctum azure  */
+  --chart-2: #3E8B96;  /* teal-azure     */
+  --chart-3: #6A5B9D;  /* sanctum violet */
+  --chart-4: #B8843E;  /* sanctum bronze */
+  --chart-5: #607694;  /* slate          */
+
+  --sidebar: var(--surface-2);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent-rgb);
+  --sidebar-primary-foreground: var(--accent-ink);
+  --sidebar-accent: var(--surface-3);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border-rgb);
+  --sidebar-ring: var(--accent-rgb);
+}
+
+.dark {
+  /* ─── ATLAS RAW TOKENS — DARK ─── */
+  --bg:           #0B0E15;
+  --surface:      #141826;
+  --surface-2:    #1C2231;
+  --surface-3:    #242B3D;
+  --surface-code: #07090E;
+  --surface-input:#141826;
+
+  --border-rgb:   #2A3247;
+  --border-soft:  #1E2535;
+  --border-hi:    #3A445F;
+
+  --text:         #E8EAF0;
+  --text-muted:   #8C95AB;
+  --text-dim:     #5A6178;
+
+  --accent-rgb:   #6FA5F0;
+  --accent-hi:    #92BEFF;
+  --accent-lo:    #4A7FCF;
+  --accent-deep:  #2C5BA0;
+  --accent-glow:  rgba(111, 165, 240, 0.18);
+  --accent-tint:  rgba(111, 165, 240, 0.08);
+  --accent-ink:   #050A14;
+
+  --success:      #5BC68A;
+  --success-tint: rgba(91, 198, 138, 0.12);
+  --warning:      #E8B547;
+  --warning-tint: rgba(232, 181, 71, 0.12);
+  --danger:       #E55B71;
+  --danger-tint:  rgba(229, 91, 113, 0.12);
+
+  --grid-major:   rgba(255, 255, 255, 0.018);
+  --grid-minor:   rgba(255, 255, 255, 0.012);
+
+  --popover-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* ─── SHADCN STANDARD TOKENS — DARK ─── */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface-2);
+  --popover-foreground: var(--text);
+  --primary: var(--accent-rgb);
+  --primary-foreground: var(--accent-ink);
+  --secondary: var(--surface-3);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-3);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --destructive-foreground: #0B0E15;
+  --border: var(--border-rgb);
+  --input: var(--border-rgb);
+  --ring: var(--accent-rgb);
+
+  /* Dark-mode categorical palette — lifted for legibility on dark surfaces. */
+  --chart-1: #6FA5F0;  /* azure lifted   */
+  --chart-2: #5FBDC8;  /* teal lifted    */
+  --chart-3: #9B8FD4;  /* violet lifted  */
+  --chart-4: #E0B26E;  /* bronze lifted  */
+  --chart-5: #8B9BB2;  /* slate lifted   */
+
+  --sidebar: var(--surface-2);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accent-rgb);
+  --sidebar-primary-foreground: var(--accent-ink);
+  --sidebar-accent: var(--surface-3);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--border-rgb);
+  --sidebar-ring: var(--accent-rgb);
+}
+
+/* ─── @theme inline — exposes vars as Tailwind utilities ─── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Atlas extensions surfaced as Tailwind utilities */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-code: var(--surface-code);
+  --color-surface-input: var(--surface-input);
+  --color-border-soft: var(--border-soft);
+  --color-border-hi: var(--border-hi);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-accent-hi: var(--accent-hi);
+  --color-accent-lo: var(--accent-lo);
+  --color-accent-deep: var(--accent-deep);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 0.125rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.125rem);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    font-size: 14.5px;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--accent-glow);
+    color: var(--text);
+  }
+
+  a {
+    color: var(--accent-rgb);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--accent-hi);
+  }
+}
+
+/* ─── Faint global grid — opt in by adding `.atlas-grid` to body ─── */
+.atlas-grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent 0 31px, var(--grid-major) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--grid-minor) 31px 32px);
+  pointer-events: none;
+  z-index: 0;
+}
